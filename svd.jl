@@ -44,8 +44,8 @@ begin
 	using StatsBase
 	white_wines = CSV.read("./data/winequality-white.csv", DataFrame)
 	# add type columns
-	white_wines[:type] = "white"
-	red_wines[:type] = "red"
+	insertcols!(white_wines, "type" => "white")
+	insertcols!(red_wines, "type"=>"red")
 	# remove quality columns
 	white_wines_attr = white_wines[:, Not(:quality)]
 	red_wines_attr = red_wines[:, Not(:quality)]
@@ -138,13 +138,13 @@ end
 
 # ╔═╡ 756f6d2a-26f2-11eb-3edc-e35dc3a0d008
 begin
-	plot(red_wines[:quality], label="actual")
+	plot(red_wines[:, :quality], label="actual")
 	plot!(convert(Matrix, A) * xtilde, label="regression")
 end
 
 # ╔═╡ d608b018-26f4-11eb-0d46-a983f066603c
 begin
-	plot(sort(red_wines[:quality]), label="actual - sorted")
+	plot(sort(red_wines[:, :quality]), label="actual - sorted")
 	plot!(sort(convert(Matrix, A) * xtilde), label="regression - sorted")
 end
 
@@ -232,9 +232,6 @@ begin
 	ylabel!("PC 2")
 end
 
-# ╔═╡ a13dd0aa-27e8-11eb-0900-bbb322039c18
-plotattr()
-
 # ╔═╡ Cell order:
 # ╟─f915c12c-257d-11eb-3b14-8b8e1b2d88c3
 # ╟─29d43546-257e-11eb-1798-61d73166af62
@@ -252,13 +249,12 @@ plotattr()
 # ╠═b46074f0-26ef-11eb-07f7-3349bbba759b
 # ╠═756f6d2a-26f2-11eb-3edc-e35dc3a0d008
 # ╠═d608b018-26f4-11eb-0d46-a983f066603c
-# ╠═ac155e7c-27d6-11eb-0619-e517d0ff58a9
+# ╟─ac155e7c-27d6-11eb-0619-e517d0ff58a9
 # ╟─b8e5cbf2-27d9-11eb-24ac-0b4ece146b32
 # ╠═39643d90-27da-11eb-3d9b-77f408dacc4c
 # ╟─9fee3c02-27da-11eb-3b7e-b122473c1684
 # ╠═33f62696-27dc-11eb-3f6c-1748defef375
 # ╠═2503f7f4-27e0-11eb-322e-7775422d4435
-# ╠═e3f0ad3c-27e1-11eb-00ce-656462b95762
+# ╟─e3f0ad3c-27e1-11eb-00ce-656462b95762
 # ╠═a04bd5ba-27e2-11eb-0154-0319b6850b54
 # ╠═4172f568-27e3-11eb-3f7e-532ed1353b9d
-# ╠═a13dd0aa-27e8-11eb-0900-bbb322039c18
