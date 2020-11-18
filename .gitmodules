@@ -1,0 +1,3 @@
+[submodule "StatisticalRethinking"]
+	path = StatisticalRethinking
+	url = https://github.com/prakaa/StatisticalRethinking.git
