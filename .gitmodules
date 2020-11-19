@@ -1,3 +1,6 @@
 [submodule "StatisticalRethinking"]
 	path = StatisticalRethinking
 	url = https://github.com/prakaa/StatisticalRethinking.git
+[submodule "SIIPExamples.jl"]
+	path = SIIPExamples.jl
+	url = git@github.com:NREL-SIIP/SIIPExamples.jl.git
