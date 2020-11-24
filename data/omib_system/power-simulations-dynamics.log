@@ -1,0 +1,18 @@
+┌ Info: 2020-11-24T10:50:57.973 [1634516:1]: Unit System changed to DEVICE_BASE
+└ @ PowerSystems /home/abi/.julia/packages/PowerSystems/hE7SB/src/base.jl:240
+┌ Info: 2020-11-24T10:50:57.973 [1634516:1]: The System has no islands
+└ @ PowerSystems /home/abi/.julia/packages/PowerSystems/hE7SB/src/utils/network_calculations/ybus_calculations.jl:139
+┌ Info: 2020-11-24T10:50:57.973 [1634516:1]: Initializing Simulation States
+└ @ PowerSimulationsDynamics /home/abi/.julia/packages/PowerSimulationsDynamics/BcwNG/src/base/simulation.jl:177
+┌ Info: 2020-11-24T10:50:57.973 [1634516:1]: Unit System changed to SYSTEM_BASE
+└ @ PowerSystems /home/abi/.julia/packages/PowerSystems/hE7SB/src/base.jl:240
+┌ Info: 2020-11-24T10:50:57.973 [1634516:1]: The System has no islands
+└ @ PowerSystems /home/abi/.julia/packages/PowerSystems/hE7SB/src/utils/network_calculations/ybus_calculations.jl:139
+┌ Info: 2020-11-24T10:50:57.973 [1634516:1]: PowerFlow solve converged, the results have been stored in the system
+└ @ PowerSystems /home/abi/.julia/packages/PowerSystems/hE7SB/src/utils/power_flow.jl:298
+┌ Info: 2020-11-24T10:50:57.973 [1634516:1]: Unit System changed to DEVICE_BASE
+└ @ PowerSystems /home/abi/.julia/packages/PowerSystems/hE7SB/src/base.jl:246
+┌ Info: 2020-11-24T10:50:57.974 [1634516:1]: Attaching Perturbations
+└ @ PowerSimulationsDynamics /home/abi/.julia/packages/PowerSimulationsDynamics/BcwNG/src/base/simulation.jl:213
+┌ Info: 2020-11-24T10:50:57.974 [1634516:1]: Completed Build Successfully. Simulations status = BUILT
+└ @ PowerSimulationsDynamics /home/abi/.julia/packages/PowerSimulationsDynamics/BcwNG/src/base/simulation.jl:196

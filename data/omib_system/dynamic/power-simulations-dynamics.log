@@ -1,0 +1,71 @@
+┌ Info: 2020-11-24T12:26:00.012 [2181802:1]: Unit System changed to DEVICE_BASE
+└ @ PowerSystems /home/abi/.julia/packages/PowerSystems/hE7SB/src/base.jl:240
+┌ Info: 2020-11-24T12:26:00.012 [2181802:1]: The System has no islands
+└ @ PowerSystems /home/abi/.julia/packages/PowerSystems/hE7SB/src/utils/network_calculations/ybus_calculations.jl:139
+┌ Debug: 2020-11-24T12:26:00.012 [2181802:1]: System doesn't contain Dynamic Branches
+└ @ PowerSimulationsDynamics /home/abi/.julia/packages/PowerSimulationsDynamics/BcwNG/src/base/simulation_inputs.jl:115
+┌ Debug: 2020-11-24T12:26:00.012 [2181802:1]: 2
+└ @ PowerSimulationsDynamics /home/abi/.julia/packages/PowerSimulationsDynamics/BcwNG/src/base/simulation_inputs.jl:157
+┌ Debug: 2020-11-24T12:26:00.012 [2181802:1]: Simulation Inputs Created
+└ @ PowerSimulationsDynamics /home/abi/.julia/packages/PowerSimulationsDynamics/BcwNG/src/base/simulation.jl:167
+┌ Info: 2020-11-24T12:26:00.012 [2181802:1]: Initializing Simulation States
+└ @ PowerSimulationsDynamics /home/abi/.julia/packages/PowerSimulationsDynamics/BcwNG/src/base/simulation.jl:177
+┌ Debug: 2020-11-24T12:26:00.012 [2181802:1]: Auxiliary Arrays created with Type Float64
+└ @ PowerSimulationsDynamics /home/abi/.julia/packages/PowerSimulationsDynamics/BcwNG/src/base/simulation.jl:201
+┌ Debug: 2020-11-24T12:26:00.012 [2181802:1]: Start state intialization routine
+└ @ PowerSimulationsDynamics /home/abi/.julia/packages/PowerSimulationsDynamics/BcwNG/src/base/simulation_initialization.jl:2
+┌ Info: 2020-11-24T12:26:00.012 [2181802:1]: Unit System changed to SYSTEM_BASE
+└ @ PowerSystems /home/abi/.julia/packages/PowerSystems/hE7SB/src/base.jl:240
+┌ Info: 2020-11-24T12:26:00.012 [2181802:1]: The System has no islands
+└ @ PowerSystems /home/abi/.julia/packages/PowerSystems/hE7SB/src/utils/network_calculations/ybus_calculations.jl:139
+┌ Info: 2020-11-24T12:26:00.012 [2181802:1]: PowerFlow solve converged, the results have been stored in the system
+└ @ PowerSystems /home/abi/.julia/packages/PowerSystems/hE7SB/src/utils/power_flow.jl:298
+┌ Info: 2020-11-24T12:26:00.012 [2181802:1]: Unit System changed to DEVICE_BASE
+└ @ PowerSystems /home/abi/.julia/packages/PowerSystems/hE7SB/src/base.jl:246
+┌ Debug: 2020-11-24T12:26:00.012 [2181802:1]: Setting up initilization indexing
+└ @ PowerSimulationsDynamics /home/abi/.julia/packages/PowerSimulationsDynamics/BcwNG/src/base/simulation_initialization.jl:11
+┌ Debug: 2020-11-24T12:26:00.012 [2181802:1]: Updating Voltage guess
+└ @ PowerSimulationsDynamics /home/abi/.julia/packages/PowerSimulationsDynamics/BcwNG/src/base/simulation_initialization.jl:20
+┌ Debug: 2020-11-24T12:26:00.012 [2181802:1]: BUS 2       
+└ @ PowerSimulationsDynamics /home/abi/.julia/packages/PowerSimulationsDynamics/BcwNG/src/base/simulation_initialization.jl:22
+┌ Debug: 2020-11-24T12:26:00.012 [2181802:1]: V_r
+│   PSY.get_magnitude(bus) * cos(PSY.get_angle(bus)) = 1.039727418725999
+└ @ PowerSimulationsDynamics /home/abi/.julia/packages/PowerSimulationsDynamics/BcwNG/src/base/simulation_initialization.jl:23
+┌ Debug: 2020-11-24T12:26:00.012 [2181802:1]: V_i
+│   PSY.get_magnitude(bus) * sin(PSY.get_angle(bus)) = 0.023809551641536846
+└ @ PowerSimulationsDynamics /home/abi/.julia/packages/PowerSimulationsDynamics/BcwNG/src/base/simulation_initialization.jl:24
+┌ Debug: 2020-11-24T12:26:00.012 [2181802:1]: BUS 1       
+└ @ PowerSimulationsDynamics /home/abi/.julia/packages/PowerSimulationsDynamics/BcwNG/src/base/simulation_initialization.jl:22
+┌ Debug: 2020-11-24T12:26:00.012 [2181802:1]: V_r
+│   PSY.get_magnitude(bus) * cos(PSY.get_angle(bus)) = 1.05
+└ @ PowerSimulationsDynamics /home/abi/.julia/packages/PowerSimulationsDynamics/BcwNG/src/base/simulation_initialization.jl:23
+┌ Debug: 2020-11-24T12:26:00.012 [2181802:1]: V_i
+│   PSY.get_magnitude(bus) * sin(PSY.get_angle(bus)) = 0.0
+└ @ PowerSimulationsDynamics /home/abi/.julia/packages/PowerSimulationsDynamics/BcwNG/src/base/simulation_initialization.jl:24
+┌ Debug: 2020-11-24T12:26:00.012 [2181802:1]: Updating Source internal voltages
+└ @ PowerSimulationsDynamics /home/abi/.julia/packages/PowerSimulationsDynamics/BcwNG/src/base/simulation_initialization.jl:31
+┌ Debug: 2020-11-24T12:26:00.013 [2181802:1]: Updating Dynamic Injection Component Initial Guess
+└ @ PowerSimulationsDynamics /home/abi/.julia/packages/PowerSimulationsDynamics/BcwNG/src/base/simulation_initialization.jl:39
+┌ Debug: 2020-11-24T12:26:00.013 [2181802:1]: generator-102-1
+│   typeof(d) = DynamicGenerator{BaseMachine,SingleMass,AVRFixed,TGFixed,PSSFixed}
+└ @ PowerSimulationsDynamics /home/abi/.julia/packages/PowerSimulationsDynamics/BcwNG/src/base/simulation_initialization.jl:41
+┌ Debug: 2020-11-24T12:26:00.013 [2181802:1]: Updating Component Initial Guess
+└ @ PowerSimulationsDynamics /home/abi/.julia/packages/PowerSimulationsDynamics/BcwNG/src/base/simulation_initialization.jl:53
+┌ Debug: 2020-11-24T12:26:00.013 [2181802:1]: No Dynamic Branches in the system
+└ @ PowerSimulationsDynamics /home/abi/.julia/packages/PowerSimulationsDynamics/BcwNG/src/base/simulation_initialization.jl:71
+┌ Debug: 2020-11-24T12:26:00.013 [2181802:1]: Start NLSolve Run
+└ @ PowerSimulationsDynamics /home/abi/.julia/packages/PowerSimulationsDynamics/BcwNG/src/base/simulation_initialization.jl:83
+┌ Debug: 2020-11-24T12:26:00.013 [2181802:1]: Write result to initial guess vector
+└ @ PowerSimulationsDynamics /home/abi/.julia/packages/PowerSimulationsDynamics/BcwNG/src/base/simulation_initialization.jl:106
+┌ Info: 2020-11-24T12:26:00.013 [2181802:1]: Attaching Perturbations
+└ @ PowerSimulationsDynamics /home/abi/.julia/packages/PowerSimulationsDynamics/BcwNG/src/base/simulation.jl:213
+┌ Debug: 2020-11-24T12:26:00.013 [2181802:1]: ThreePhaseFault(1.0, 
+│   [1, 1]  =  0.0-10.0im
+│   [2, 1]  =  0.0+10.0im
+│   [1, 2]  =  0.0+10.0im
+│   [2, 2]  =  0.0-10.0im)
+└ @ PowerSimulationsDynamics /home/abi/.julia/packages/PowerSimulationsDynamics/BcwNG/src/base/simulation.jl:224
+┌ Debug: 2020-11-24T12:26:00.013 [2181802:1]: Auxiliary Arrays created with Type Float64
+└ @ PowerSimulationsDynamics /home/abi/.julia/packages/PowerSimulationsDynamics/BcwNG/src/base/simulation.jl:201
+┌ Info: 2020-11-24T12:26:00.013 [2181802:1]: Completed Build Successfully. Simulations status = BUILT
+└ @ PowerSimulationsDynamics /home/abi/.julia/packages/PowerSimulationsDynamics/BcwNG/src/base/simulation.jl:196
