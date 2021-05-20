@@ -4,3 +4,9 @@
 [submodule "SIIPExamples.jl"]
 	path = SIIPExamples.jl
 	url = git@github.com:NREL-SIIP/SIIPExamples.jl.git
+[submodule "power-systems-optimization"]
+	path = power-systems-optimization
+	url = git@github.com:east-winds/power-systems-optimization.git
+[submodule "SciMLTutorials.jl"]
+	path = SciMLTutorials.jl
+	url = git@github.com:SciML/SciMLTutorials.jl.git
