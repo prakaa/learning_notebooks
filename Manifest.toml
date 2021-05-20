@@ -181,22 +181,10 @@ git-tree-sha1 = "2e62a725210ce3c3c2e1a3080190e7ca491f18d7"
 uuid = "523fee87-0ab8-5b00-afb7-3ecf72e48cfd"
 version = "0.7.2"
 
-[[CodecLz4]]
-deps = ["Lz4_jll", "TranscodingStreams"]
-git-tree-sha1 = "59fe0cb37784288d6b9f1baebddbf75457395d40"
-uuid = "5ba52731-8f18-5e0d-9241-30f10d1ec561"
-version = "0.4.0"
-
 [[CodecZlib]]
 deps = ["TranscodingStreams", "Zlib_jll"]
 git-tree-sha1 = "ded953804d019afa9a3f98981d99b33e3db7b6da"
 uuid = "944b1d66-785c-5afd-91f1-9de20f533193"
-version = "0.7.0"
-
-[[CodecZstd]]
-deps = ["TranscodingStreams", "Zstd_jll"]
-git-tree-sha1 = "d19cd9ae79ef31774151637492291d75194fc5fa"
-uuid = "6b39b394-51ab-5f42-8807-6242bab2b4c2"
 version = "0.7.0"
 
 [[CoinUtils_jll]]
@@ -870,12 +858,6 @@ deps = ["Dates", "Mmap", "Parsers", "StructTypes", "UUIDs"]
 git-tree-sha1 = "65798ad6ddb0d7068f2b1885e0b0d876efca16f5"
 uuid = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
 version = "1.8.1"
-
-[[JSON3]]
-deps = ["Dates", "Mmap", "Parsers", "StructTypes", "UUIDs"]
-git-tree-sha1 = "961ef1c3e5c8a595d5bec270a9007429ef12ed10"
-uuid = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
-version = "1.5.1"
 
 [[JSONSchema]]
 deps = ["HTTP", "JSON", "ZipFile"]
@@ -1783,9 +1765,9 @@ version = "1.7.0"
 
 [[VectorizationBase]]
 deps = ["ArrayInterface", "Hwloc", "IfElse", "Libdl", "LinearAlgebra", "Static"]
-git-tree-sha1 = "999058fab065ff27b1e99bbee93aca50fa58c640"
+git-tree-sha1 = "2d0b5e087c44346d0bf74f47d0a792a7f242c1cc"
 uuid = "3d5dd08c-fd9d-11e8-17fa-ed2836048c2f"
-version = "0.20.6"
+version = "0.20.7"
 
 [[VersionParsing]]
 git-tree-sha1 = "80229be1f670524750d905f8fc8148e5a8c4537f"
