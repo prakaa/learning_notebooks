@@ -13,10 +13,10 @@ end
 
 # ╔═╡ 658534ae-b901-11eb-3a20-153b9188b496
 md"""
-# Economic Dispatch (with Reserves) and Unit Commitment
+# Economic Dispatch (with Reserves)
 This is heavily based on the the tutorial available in [JuMP's documentation](https://jump.dev/JuMP.jl/dev/tutorials/Mixed-integer%20linear%20programs/power_systems/).
 
-However, I have tried to adapt the example to demonstrate how reserves (e.g. FCAS) might be co-optimised in economic dispatch and show an example of how co-optimisation incorporates the *opportunity-cost* of reserve provision.
+However, I have tried to adapt the economic dispatch example to demonstrate how reserves (e.g. FCAS) might be co-optimised in economic dispatch and show an example of how co-optimisation incorporates the *opportunity-cost* of reserve provision.
 """
 
 # ╔═╡ 7c118911-43f8-4498-89a7-1ee944b82049
@@ -30,14 +30,14 @@ md"""
 
 Some major assumptions to simplify this:
 - We solve for a single time, so all units of energy expressed in MW
+  - No time sequential modelling, which includes ramping constraints
 - Assume no transmission losses
 - Assume no transmission constraints
 - Assume this is a regional, single price market with marginal pricing
-- Solve ED & UC for a single point in time
-  - No time sequential modelling, which includes ramping and start-up and shut-down times and constraints
-- We do not account for the cost of start-up and shut-down in UC
+- Assume that generator offers reflect short-run marginal costs and that the market accepts only one price-quantity pair (in the NEM, 10 price-quantity pairs are accepted for energy and FCAS)
 
-Furthermore, we assume:
+
+Furthermore, in terms of generation, we assume:
 - Generator 1 is coal and dispatchable
 - Generator 2 is CCGT and dispatchable
 - There is a third dispatchable generator (OCGT) for the reserve problem
@@ -123,6 +123,11 @@ Demand: $d MW
 (g_opt, w_opt, ws_opt, obj, model, con) = solve_ed(gen_data.g_max, gen_data.g_min,
 								         	   	   gen_data.c_g, c_w, d, w_f);
 
+# ╔═╡ b026eda0-c5b1-4c63-a755-97fdd06a8203
+md"""
+Check for feasibility and duality
+"""
+
 # ╔═╡ f1b110d5-fed9-4112-8c72-7469f6a80d36
 primal_status(model)
 
@@ -145,7 +150,7 @@ For a demand of $d MW, economic dispatch results in a dispatch of:
 
 Total cost: \$ $obj
 
-Shadow price of energy balance constraint: $(shadow_price(con)), so marginal cost is \$$(shadow_price(con)*-1)/MW. This is the price of energy.
+Shadow price of energy balance constraint (supply = demand): $(shadow_price(con)), so marginal cost is \$$(shadow_price(con)*-1)/MW. This is the price of energy.
 
 -----
 """
@@ -158,6 +163,7 @@ Now run a model with **demand at 600 MW**.
 
 # ╔═╡ 205fffe4-9cd6-4092-929f-a3ccf0434ff6
 md"""
+##### A note about modifying JuMP models
 If a constraint or the objective function is changed, it is faster to modify specific constraint or objective function to reduce computational burden or rebuilding the model. 
 
 For example, modifying the demand can be done by redefining the constraint and resolving, rather than specifying an entirely new model."""
@@ -182,9 +188,9 @@ For a demand of $d_new MW, economic dispatch results in a dispatch of:
 
 Total cost: \$ $obj_new
 
-Shadow price of energy balance constraint: $(shadow_price(con)), so marginal cost is \$$(shadow_price(con)*-1)/MW. This is the price of energy.
+Shadow price of energy balance constraint (supply = demand): $(shadow_price(con)), so marginal cost is \$$(shadow_price(con)*-1)/MW. This is the price of energy.
 
-In this case, wind energy is spilled because minimum generation constraints must be met for Generators 1 and 2. We will attempt to rectify this in the Unit Commitment section.
+In this case, wind energy is spilled because minimum generation constraints must be met for Generators 1 and 2.
 
 """
 
@@ -269,6 +275,11 @@ R = 701
 						   c_w, reserve_gen_data.c_r,
 						   R, d, w_f);
 
+# ╔═╡ 62d03d73-caa3-430e-8d97-014166a0ac5c
+md"""
+Check for feasibility and duality
+"""
+
 # ╔═╡ a6695f34-24b0-4cf9-915a-1be3ae8ac105
 primal_status(r_mod)
 
@@ -291,9 +302,9 @@ For a demand of $d MW, economic dispatch results in a dispatch of:
 
 Total cost: \$ $obj_r
 
-Shadow price of energy balance constraint: $(shadow_price(en_con)), so marginal cost is \$$(shadow_price(en_con)*-1)/MW. This is the price of energy.
+Shadow price of energy balance constraint (supply = demand): $(shadow_price(en_con)), so marginal cost is \$$(shadow_price(en_con)*-1)/MW. This is the price of energy.
 
-Shadow price of energy balance constraint: $(shadow_price(r_con)), so marginal cost is \$$(shadow_price(r_con)*-1)/MW. This is the price of reserves.
+Shadow price of reserve requirement constraint (∑r = R): $(shadow_price(r_con)), so marginal cost is \$$(shadow_price(r_con)*-1)/MW. This is the price of reserves.
 
 """
 
@@ -303,11 +314,12 @@ md"""
 
 Why is the reserve price 280 when reserve offers are 40, 80 or 500?
 
+##### Shadow prices and marginal prices
+
 Marginal prices for energy and reserves are essentially the price to service an infinitesimal increase in demand. For our thought experiment, we will simplify this by thinking of the cost to service the next MW of demand or reserve.
 
-##### Shadow prices and marginal prices
-The marginal price for energy is formally the *shadow price* of the supply-demand balance constraint (also known as the value of the Lagrange multiplier or dual variable of the constraint at the optimal value). Similarly, the marginal price for reserves is the shadow price of the reserve requirement constraint. In this case, the shadow price represents the additional cost of the objective function if the constraint is relaxed. 
-
+###### Formal and simpler definition
+The marginal price for energy is formally the *shadow price* of the supply-demand balance constraint (also known as the value of the Lagrange multiplier, or the value of the dual variable of the constraint at the optimal value of the dual problem). Similarly, the marginal price for reserves is the shadow price of the reserve requirement constraint. In this case, the shadow price represents the additional cost of the objective function if the constraint is relaxed. 
 
 Simply put, a shadow price is effectively the *total additional cost to the system* to supply the next MW of energy or reserve.
 
@@ -315,109 +327,14 @@ Simply put, a shadow price is effectively the *total additional cost to the syst
 In the situation above, it is cheapest to service the next MW of energy by turning up Generator 3, so the marginal cost of energy is 300. 
 
 ##### Marginal price of reserve
-However, for the next MW of reserve, it is actually cheapest to turn Generator 2's energy production down 1 MW and thereby obtain 1 MW of reserve from Generator 2. However, to ensure that energy supply and demand and balanced, Generator 3 must be turned up 1 MW. Obtaining reserve from Generator 2 costs 80 (\$c^r_2\$), turning Generator 2 down 1 MW in energy costs -100 and turning Generator 3 up 1 MW in energy costs 300, giving us a total of 280. Hence the *total* cost to the system to increase reserves by 1 MW has been accounted for.
+However, for the next MW of reserve, it is actually cheapest to turn Generator 2's energy production down 1 MW and thereby obtain 1 MW of reserve from Generator 2. However, to ensure that energy supply and demand and balanced, Generator 3 must be turned up 1 MW. Obtaining reserve from Generator 2 costs 80 (\$c^r_2\$), turning Generator 2 down 1 MW in energy "costs" -100 (turning it down actually reduces the total cost) and turning Generator 3 up 1 MW in energy costs 300, giving us a total of 280. Hence the *total* cost to the system to increase reserves by 1 MW has been accounted for.
 
-**Participant's perspective**
-From the perspective of Generator 2, co-optimisation ensures that opporunity-cost in the energy market is accounted for. The price for reserves is set by Generator 2 and is the sum of its reserve offer cost and the opporunity-cost in the energy market:
+###### Participant's perspective
+From the perspective of Generator 2, co-optimisation ensures that opporunity-cost in the energy market is accounted for. Since the price for reserves is set by Generator 2, the marginal price is the sum of its reserve offer cost and its opporunity-cost in the energy market:
 1. The reserve offer is 80.
-2. By being turned down 1 MW in the energy market, Generator 2 misses out on a profit of 300 (price of energy) - 100 (Generator 2's short run marginal cost, or assumed to be anyway) = 200. 
+2. By being turned down 1 MW in the energy market, Generator 2 misses out on a profit (opportunity cost). This is:
+    - (Price of energy) - (Generator 2's short run marginal cost, or assumed to be anyway), which in this case is (300)-(100) = 200. 
 The sum of these is 280, the price of reserves. Simply put, if a unit is backed off energy to provide reserves (e.g. FCAS), the optimisation will ensure that it does not miss out on any profits so long as its bids reflect short run marginal costs.
-"""
-
-# ╔═╡ 19dead1b-858b-424a-90fb-860a06dce79e
-md"""
-### Limitations of our Economic Dispatch Implementation
-#### Wind spillage
-- Does not perform unit commitment
-- As demand is reduced, min. generation levels for unit 1 and 2 will be maintained despite wind being cheaper
-#### Transmission constraints
-  - Market based and does not consider limitations of transmissions
-  - In NEM:
-    - Interconnector constraints implemented
-    - Optimal power flow used to determine constraints for ED
-    - Regional rather than nodal
-"""
-
-# ╔═╡ 337c5d57-768a-4cba-8f79-87fd36e9e32a
-md"""
-## Unit Commitment
-
-We introduce binary variables (1 for synchronised and dispatchable, 0 for not synchronised).
-
-In the model, we can achieve this by modifying the constraint for unit energy generation:
-  - ``g_i^{min} ⋅ u_{t, i} ≤ g_i ≤ g_i^{max} ⋅ u_{ti, i}`` where ``u_i ∈ {0,1}``
-
-``t`` here is important as ``u`` could be 0 at time ``t`` and 1 at time ``t+1``. This would require start-up (and in the converse situation,  shut-down) costs to be accounted for. We do not account for these here.
-"""
-
-# ╔═╡ 6e6bbea5-8500-49b3-aad1-fd4eb6c8706c
-md"""
-### JuMP implementation
-"""
-
-# ╔═╡ 384e5354-95fb-47b6-8173-155d177f8009
-function solve_uc(g_max, g_min, c_g, c_w, d, w_f)
-	uc = Model(GLPK.Optimizer)
-	@variable(uc, 0 <= g[i=1:2] <= g_max[i]) # gen between 0 and max
-	@variable(uc, u[i = 1:2], Bin) # binary variables
-	@variable(uc, 0 <= w <= w_f) # wind power injection
-	@constraint(uc, [i = 1:2], g[i] <= g_max[i] * u[i]) # max constraint with integer
-	@constraint(uc, [i = 1:2], g[i] >= g_min[i] * u[i]) # min constraint with integer
-	@constraint(uc, w <= w_f) # wind forecast constraint
-	@constraint(uc, sum(g) + w == d) # energy balance
-	@objective(uc, Min, c_g'* g + c_w * w)
-	optimize!(uc)
-	status = termination_status(uc)
-	if status != MOI.OPTIMAL
-		return status, zeros(length(g)), 0.0, 0.0, zeros(length(u)), Inf
-    end
-    return status, value.(g), value(w), w_f - value(w), value.(u), 		
-		   objective_value(uc), uc
-end
-
-# ╔═╡ 148b413c-2f76-4d97-a1c9-644484d825c1
-md"""
-### Run Unit Commitment
-
-Run with a low demand of 600 MW (as per second ED model).
-"""
-
-# ╔═╡ 9c3ca595-9e11-43ea-a599-95905c5812fc
-(status, g_uc, w_uc, ws_uc, bin, obj_uc, uc) = solve_uc(gen_data.g_max, 
-														gen_data.g_min,
-								            	   		gen_data.c_g, c_w, d_new, 
-														w_f);
-
-# ╔═╡ 26207350-9622-47a8-9e5c-32649ba85dbc
-status
-
-# ╔═╡ 4f8c9187-d8e9-48a3-a3d6-f86876288ddb
-primal_status(uc)
-
-# ╔═╡ 427dd841-d66a-4fe9-b86d-bad5a6030ff6
-dual_status(uc)
-
-# ╔═╡ 56d11661-6bad-4e73-afff-7d31dd638501
-md"""
-No dual problem (provided by JuMP at least) so we won't calculate the shadow price
-"""
-
-# ╔═╡ c138be43-ad56-4212-bcee-f1b311bd3e98
-md"""
-#### Results
-For a demand of $d_new MW, unit commitment results in commitment:
-  - ``g_1``: Commitment: $(bin[1]) - $(g_uc[1]) MW
-  - ``g_2``: Commitment: $(bin[2]) - $(g_uc[2]) MW
-  - Wind: $w_uc MW, spilled = $(ws_uc) MW
-
-Total cost: \$ $obj_uc
-
-Saving compared to similar economic dispatch model: \$$(obj_new-obj_uc)
-"""
-
-# ╔═╡ cbe76c5a-79fe-423d-b6da-6ef985d0f4c4
-md"""
-We have not run time sequential unit commitment or economic dispatch to account for ramping constraints and start-up and shut-down costs
 """
 
 # ╔═╡ Cell order:
@@ -434,6 +351,7 @@ We have not run time sequential unit commitment or economic dispatch to account 
 # ╟─f2572466-4ce7-42f8-a84b-44c529b9a72a
 # ╟─164852aa-b904-4039-b851-abc40dccd046
 # ╠═79b8d28c-3ad7-4726-9d65-955ceaf0f2b7
+# ╟─b026eda0-c5b1-4c63-a755-97fdd06a8203
 # ╠═f1b110d5-fed9-4112-8c72-7469f6a80d36
 # ╠═31d6d379-497f-4f84-b4bd-46678a0be787
 # ╟─a22df840-aa3a-4bac-99cc-50bdbacadee8
@@ -449,20 +367,9 @@ We have not run time sequential unit commitment or economic dispatch to account 
 # ╟─b73b8cc0-bcb6-4a96-ba68-6bd898305760
 # ╠═882ddb8c-a8eb-42cc-8f53-03723875608a
 # ╠═be45d9fc-c539-4cde-babd-92c03bc7f044
+# ╟─62d03d73-caa3-430e-8d97-014166a0ac5c
 # ╠═a6695f34-24b0-4cf9-915a-1be3ae8ac105
 # ╠═3872a97b-5760-4ee3-88b5-adc22a42c34b
 # ╟─af9e70d2-2fba-436c-8f82-9e8f941074a6
 # ╟─6d70c9f6-d708-4d42-ab23-e449edc6f895
 # ╟─9778a606-ff49-4ce9-927c-c5cd259503e0
-# ╟─19dead1b-858b-424a-90fb-860a06dce79e
-# ╟─337c5d57-768a-4cba-8f79-87fd36e9e32a
-# ╟─6e6bbea5-8500-49b3-aad1-fd4eb6c8706c
-# ╠═384e5354-95fb-47b6-8173-155d177f8009
-# ╟─148b413c-2f76-4d97-a1c9-644484d825c1
-# ╠═9c3ca595-9e11-43ea-a599-95905c5812fc
-# ╟─26207350-9622-47a8-9e5c-32649ba85dbc
-# ╠═4f8c9187-d8e9-48a3-a3d6-f86876288ddb
-# ╠═427dd841-d66a-4fe9-b86d-bad5a6030ff6
-# ╠═56d11661-6bad-4e73-afff-7d31dd638501
-# ╟─c138be43-ad56-4212-bcee-f1b311bd3e98
-# ╟─cbe76c5a-79fe-423d-b6da-6ef985d0f4c4
