@@ -270,7 +270,7 @@ R = 701
 						   R, d, w_f);
 
 # ╔═╡ a6695f34-24b0-4cf9-915a-1be3ae8ac105
-primal_status(r_mod)
+termination_status(r_mod)
 
 # ╔═╡ 3872a97b-5760-4ee3-88b5-adc22a42c34b
 has_duals(r_mod)
