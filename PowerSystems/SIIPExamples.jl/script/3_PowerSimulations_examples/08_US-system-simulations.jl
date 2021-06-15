@@ -6,7 +6,7 @@
 # ## Introduction
 
 # This example shows a basic PCM simulation using the system data assembled in the
-# [US-System example](../../notebook/2_PowerSystems_examples/US_system.ipynb).
+# [US-System example](https://nbviewer.jupyter.org/github/NREL-SIIP/SIIPExamples.jl/blob/master/notebook/2_PowerSystems_examples/08_US_system.ipynb).
 
 # ### Dependencies
 using SIIPExamples
@@ -29,7 +29,7 @@ solver = optimizer_with_attributes(Xpress.Optimizer, "MIPRELSTOP" => 0.1, "OUTPU
 
 # ### Load the US `System`.
 # If you have run the
-# [US-System example](../../notebook/2_PowerSystems_examples/US-System.ipynb), the data will
+# [US-System example](https://nbviewer.jupyter.org/github/NREL-SIIP/SIIPExamples.jl/blob/master/notebook/2_PowerSystems_examples/08_US-System.ipynb), the data will
 # be serialized in the json and H5 format, so we can efficiently deserialize it:
 
 sys = System(joinpath(pkgpath, "US-System", "SIIP", "sys.json"))
@@ -56,62 +56,63 @@ end
 # ### Create a `template`
 # Now we can create a `template` that applies an unbounded formulation to `Line`s and the standard
 # flow limited formulation to `MonitoredLine`s.
-branches = Dict{Symbol, DeviceModel}(
-    :L => DeviceModel(Line, StaticLineUnbounded),
-    :TT => DeviceModel(TapTransformer, StaticTransformer),
-    :ML => DeviceModel(MonitoredLine, StaticLine),
-)
+template = OperationsProblemTemplate(StandardPTDFModel)
+set_device_model!(template, Line, StaticBranchUnbounded)
+set_device_model!(template, TapTransformer, StaticBranchUnbounded)
+set_device_model!(template, MonitoredLine, StaticBranch)
+set_device_model!(template, ThermalStandard, ThermalStandardUnitCommitment)
+set_device_model!(template, RenewableDispatch, RenewableFullDispatch)
+set_device_model!(template, PowerLoad, StaticPowerLoad)
+set_device_model!(template, HydroDispatch, FixedOutput)
 
-devices = Dict(
-    :Generators => DeviceModel(ThermalStandard, ThermalStandardUnitCommitment),
-    :Ren => DeviceModel(RenewableDispatch, RenewableFullDispatch),
-    :Loads => DeviceModel(PowerLoad, StaticPowerLoad),
-    :HydroROR => DeviceModel(HydroDispatch, FixedOutput),
-)
-
-template = OperationsProblemTemplate(DCPPowerModel, devices, branches, Dict());
+ptdf = PTDF(sys)
 
 # ### Build and execute single step problem
 op_problem = OperationsProblem(
-    GenericOpProblem,
     template,
     sys;
     optimizer = solver,
     horizon = 24,
     balance_slack_variables = false,
     use_parameters = true,
+    PTDF = ptdf,
 )
 
-res = solve!(op_problem)
+build!(op_problem, output_dir = mktempdir(), console_level = Logging.Info)
+
+solve!(op_problem)
 
 # ### Analyze results
-fuel_plot(res, sys, load = true)
+res = ProblemResults(op_problem)
+plot_fuel(res)
 
 # ## Sequential Simulation
 # In addition to defining the formulation template, sequential simulations require
 # definitions for how information flows between problems.
-sim_folder = mkpath(joinpath(pkgpath, "Texas-sim"),)
-stages_definition = Dict(
-    "UC" =>
-        Stage(GenericOpProblem, template, sys, solver; balance_slack_variables = true),
+sim_folder = mkpath(joinpath(pkgpath, "Texas-sim"))
+problems = SimulationProblems(
+    UC = OperationsProblem(
+        template,
+        sys,
+        optimizer = solver,
+        balance_slack_variables = true,
+        system_to_file = false,
+        PTDF = ptdf,
+    ),
 )
-order = Dict(1 => "UC")
-horizons = Dict("UC" => 24)
 intervals = Dict("UC" => (Hour(24), Consecutive()))
 DA_sequence = SimulationSequence(
-    step_resolution = Hour(24),
-    order = order,
-    horizons = horizons,
+    problems = problems,
     intervals = intervals,
-    ini_cond_chronology = IntraStageChronology(),
+    ini_cond_chronology = IntraProblemChronology(),
 )
 
 # ### Define and build a simulation
 sim = Simulation(
     name = "Texas-test",
     steps = 3,
-    stages = stages_definition,
-    stages_sequence = DA_sequence,
+    problems = problems,
+    sequence = DA_sequence,
     simulation_folder = "Texas-sim",
 )
 
@@ -123,9 +124,10 @@ build!(
 )
 
 # ### Execute the simulation
-#nb sim_results = execute!(sim)
+#nb execute!(sim)
 
 # ### Load and analyze results
-#nb uc_results = load_simulation_results(sim_results, "UC");
+#nb results = SimulationResults(sim);
+#nb uc_results = get_problem_results(results, "UC");
 
-#nb fuel_plot(uc_results, sys, load = true, curtailment = true)
+#nb plot_fuel(uc_results)
