@@ -10,3 +10,9 @@
 [submodule "SciMLTutorials.jl"]
 	path = SciMLTutorials.jl
 	url = git@github.com:SciML/SciMLTutorials.jl.git
+[submodule "ED-UC/pglib-uc"]
+	path = ED-UC/pglib-uc
+	url = https://github.com/power-grid-lib/pglib-uc
+[submodule "ED-UC/power-systems-optimisation-course"]
+	path = ED-UC/power-systems-optimisation-course
+	url = git@github.com:east-winds/power-systems-optimization.git
