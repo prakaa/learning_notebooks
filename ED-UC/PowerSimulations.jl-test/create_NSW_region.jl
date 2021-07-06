@@ -1,17 +1,15 @@
-using TimeSeries
-using PowerSimulations
-using PowerSystems
-using DataFrames
 using CSV
 using Cbc
 using Dates
 using DataFrames
 using Ipopt
+using Logging
 using TimeSeries
 using PowerSystems
 using PowerSimulations
 
-raw_demand = CSV.read("./ReserveSimulations/data/demand.csv", DataFrame)
+sim_folder = "./ED-UC/PowerSimulations.jl-test"
+raw_demand = CSV.read(joinpath(sim_folder, "data/demand.csv"), DataFrame)
 
 # create system
 sys = System(
@@ -110,12 +108,12 @@ date_format = Dates.DateFormat("d/m/y H:M")
 di_year = collect(DateTime("01/01/2019 00:05", date_format):
                   Dates.Minute(5):
                   DateTime("01/01/2020 00:00", date_format))
-
 nsw_demand_data = TimeArray(di_year, raw_demand[:, :nsw_demand])
 nsw_demand = SingleTimeSeries("max_active_power", nsw_demand_data)
 add_time_series!(sys, nsw_load, nsw_demand)
+transform_single_time_series!(sys, 1, Minute(5))
 
-solver = optimizer_with_attributes(Ipopt.Optimizer, "loglevel"=>1, "ratioGap"=>0.5)
+solver = optimizer_with_attributes(Ipopt.Optimizer)
 ed_problem_template = OperationsProblemTemplate()
 set_device_model!(ed_problem_template, ThermalStandard, ThermalDispatch)
 set_service_model!(ed_problem_template, StaticReserve{ReserveUp}, RampReserve)
@@ -123,9 +121,8 @@ problem = OperationsProblem(ed_problem_template, sys;
                             optimizer=solver, 
                             constraint_duals=[:CopperPlateBalance, 
                                               :requirement__StaticReserve_ReserveUp],
-                            horizon=1
+                            horizon=1, balance_slack_variables=true
                             )
-transform_single_time_series!(sys, 1, Minute(5))
 sim_problem = SimulationProblems(ED=problem)
 sim_sequence = SimulationSequence(
     problems=sim_problem,
@@ -133,10 +130,11 @@ sim_sequence = SimulationSequence(
 )
 sim = Simulation(
     name="economic_dispatch",
-    steps=length(di_year),
+    steps=1,
     problems=sim_problem,
     sequence=sim_sequence,
-    simulation_folder="./ReserveSimulations/dispatch_data/"
+    simulation_folder=joinpath(sim_folder, "dispatch_data/")
 )
 
-build!(sim)
+@enter build!(sim; output_dir=joinpath(sim_folder, "dispatch_data/"),
+       serialize=true, console_level=Logging.Debug)
