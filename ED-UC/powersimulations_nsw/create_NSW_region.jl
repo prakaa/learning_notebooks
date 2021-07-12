@@ -75,16 +75,18 @@ tallawarra = ThermalStandard(;
     base_power = 1.0,
 )
 
-nsw_solar = RenewableFix(;
+nsw_solar = RenewableDispatch(;
     name = "NSWSolar",
     available = true,
     bus = nsw_bus,
-    active_power = 50.0,
+    active_power = 200.0,
     reactive_power = 0.0,
-    rating = 50.0,
+    rating = 200.0,
     prime_mover = PrimeMovers.PVe,
     power_factor=1.0,
-    base_power = 50.0,
+    base_power = 1.0,
+    reactive_power_limits = (min = -1.0, max = 1.0),
+    operation_cost = TwoPartCost(0.0, 1.0)
 )
 
 # loads
@@ -122,6 +124,12 @@ add_time_series!(
     sys, or, SingleTimeSeries("requirement", TimeArray(di_year, ones(length(di_year))))
     )
 
+# add VRE forecast timeseries
+add_time_series!(
+    sys, nsw_solar, 
+    SingleTimeSeries("max_active_power", TimeArray(di_year, ones(length(di_year))))
+    )
+
 # use SingleTimeSeries as forecasts
 transform_single_time_series!(sys, 1, Minute(5))
 
@@ -129,6 +137,7 @@ solver = optimizer_with_attributes(Ipopt.Optimizer)
 ed_problem_template = OperationsProblemTemplate()
 set_device_model!(ed_problem_template, ThermalStandard, ThermalDispatch)
 set_device_model!(ed_problem_template, PowerLoad, StaticPowerLoad)
+set_device_model!(ed_problem_template, RenewableDispatch, RenewableConstantPowerFactor)
 set_service_model!(ed_problem_template, VariableReserve{ReserveUp}, RampReserve)
 problem = OperationsProblem(ed_problem_template, sys;
                             optimizer=solver, 
