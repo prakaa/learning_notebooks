@@ -9,7 +9,7 @@ using PowerSystems
 using PowerSimulations
 using PowerGraphics
 
-sim_folder = "./ED-UC/powersimulations_nsw"
+sim_folder = "./ED-UC/powersimulations_nsw/built/"
 output_dir = joinpath(sim_folder, "dispatch_data/")
 raw_demand = CSV.read(joinpath(sim_folder, "data/demand.csv"), DataFrame)
 
