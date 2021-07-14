@@ -9,15 +9,16 @@ using PowerSystems
 using PowerSimulations
 using PowerGraphics
 
-sim_folder = "./ED-UC/powersimulations_nsw/built/"
-output_dir = joinpath(sim_folder, "dispatch_data/")
-raw_demand = CSV.read(joinpath(sim_folder, "data/demand.csv"), DataFrame)
+sim_folder = "./ED-UC/powersimulations_nsw/"
+output_dir = joinpath(sim_folder, "built", "dispatch_data")
+raw_demand = CSV.read(joinpath(sim_folder, "data", "demand.csv"), DataFrame)
 
 # create system
 sys = System(
-    1.0,
+    1.0;
 )
 set_units_base_system!(sys, "NATURAL_UNITS")
+
 
 # zone
 nsw_zone = LoadZone("NSW-LoadZone",
@@ -50,7 +51,10 @@ bayswater = ThermalStandard(;
     active_power_limits=(min=1000.0, max=2545.0),
     reactive_power_limits=(min=-1.0, max=1.0),
     ramp_limits=(up=20.67, down=15.33),
-    operation_cost=ThreePartCost((0.0, 2.868), 0.0, 200.0, 200.0),
+    operation_cost=ThreePartCost(
+        (0.0, 10.0),
+         0.0, 200.0, 200.0
+         ),
     base_power=1.0,
     time_limits=(up=0.02, down=0.02),
     prime_mover=PrimeMovers.ST,
@@ -71,7 +75,9 @@ tallawarra = ThermalStandard(;
     reactive_power_limits = (min = -1.0, max = 1.0),
     time_limits = (up = 4.0, down = 4.0),
     ramp_limits = (up = 6.0, down = 6.0),
-    operation_cost = ThreePartCost((0.0, 9.338), 0.0, 50.0, 50.0),
+    operation_cost = ThreePartCost(
+        (0.0, 100.0),
+        0.0, 50.0, 50.0),
     base_power = 1.0,
 )
 
@@ -95,10 +101,10 @@ nsw_load = PowerLoad(
     true,
     nsw_bus,
     nothing,
-    6900.0,
+    0.0,
     0.0,
     1.0,
-    maximum(raw_demand[:, :nsw_demand]),
+    1.0,
     0.0
 )
 
@@ -143,11 +149,11 @@ problem = OperationsProblem(ed_problem_template, sys;
                             optimizer=solver, 
                             constraint_duals=[:CopperPlateBalance, 
                                               :requirement__VariableReserve_ReserveUp],
-                            horizon=1, balance_slack_variables=true
+                            horizon=1, 
+                            balance_slack_variables=true
                             )
 # test op problem
-build!(problem, output_dir = joinpath(sim_folder, "problemdata"))
-solve!(problem)
+build!(problem, output_dir = joinpath(sim_folder, "built", "problemdata"))
 
 sim_problem = SimulationProblems(ED=problem)
 sim_sequence = SimulationSequence(
@@ -163,13 +169,17 @@ sim = Simulation(
     simulation_folder=output_dir
 )
 
-build!(sim; serialize=true)
+build!(sim; serialize=true, console_level=Logging.Debug)
 execute!(sim)
 
 results = SimulationResults(joinpath(output_dir, "economic_dispatch"))
 ed_results = get_problem_results(results, "ED")
 timestamps = get_realized_timestamps(ed_results)
 variables = read_realized_variables(ed_results)
+generation = get_generation_data(ed_results)
+reserves = get_service_data(ed_results)
 
 gr()
-plot_demand(ed_results)
+set_system!(ed_results, sys)
+plot_fuel(ed_results, stack=true)
+read_realized_duals(ed_results)[:CopperPlateBalance]
